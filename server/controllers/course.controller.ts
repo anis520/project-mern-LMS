@@ -17,7 +17,8 @@ import sendMail from "../utils/sendMail";
  * @method POST
  * @access private
  *
- */ export const uploadCourse = CatchAsyncError(
+ */
+export const uploadCourse = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const data = req.body;
@@ -292,6 +293,121 @@ export const addAnwser = CatchAsyncError(
           return next(new ErrorHandler(error.message, 500));
         }
       }
+
+      res.status(200).json({ success: true, course });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  }
+);
+
+/**
+ *
+ * @DESC   add review in course
+ * @ROUTE /api/v1/add-review/:id
+ * @method PUT
+ * @access private
+ *
+ */
+
+interface IAddReviewData {
+  review: string;
+  rating: number;
+  userId: string;
+}
+
+export const addReview = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userCourseList = req.user?.courses;
+      const courseId = req.params.id;
+
+      // check if course is already  exists in userCourseList based on _id
+      const courseExists = userCourseList?.some(
+        (course: any) => course._id.toString() == courseId.toString()
+      );
+
+      if (!courseExists) {
+        return next(
+          new ErrorHandler("you are not eligible to access this course", 404)
+        );
+      }
+      const course = await CourseModel.findById(courseId);
+
+      const { review, rating } = req.body as IAddReviewData;
+
+      const reviewData: any = {
+        user: req.user,
+        comment: review,
+        rating,
+      };
+
+      course?.reviews.push(reviewData);
+      let avg = 0;
+      course?.reviews.forEach((rev: any) => {
+        avg += rev.rating;
+      });
+
+      if (course) {
+        course.ratings = avg / course.reviews.length;
+      }
+
+      await course?.save();
+
+      const notification = {
+        title: "New review Recived",
+        message: `${req.user?.name} has given a review in ${course?.name}`,
+      };
+
+      res.status(201).json({ success: true, course });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  }
+);
+
+/**
+ *
+ * @DESC   add reply in review
+ * @ROUTE /api/v1/add-reply
+ * @method PUT
+ * @access private
+ *
+ */
+
+interface IAddReplyData {
+  comment: string;
+  courseId: string;
+  reviewId: string;
+}
+
+export const addReplyToReview = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { comment, courseId, reviewId } = req.body as IAddReplyData;
+
+      const course = await CourseModel.findById(courseId);
+      if (!course) {
+        return next(new ErrorHandler("Course not found", 404));
+      }
+
+      const review = course?.reviews?.find(
+        (rev: any) => rev._id.toString() == reviewId
+      );
+      if (!review) {
+        return next(new ErrorHandler("Review not found", 404));
+      }
+      const replyData: any = {
+        user: req.user,
+        comment,
+      };
+
+      if (!review.commentReplies) {
+        review.commentReplies = [];
+      }
+
+      review.commentReplies?.push(replyData);
+      await course?.save();
 
       res.status(200).json({ success: true, course });
     } catch (error: any) {

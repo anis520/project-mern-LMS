@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Order confirmation</title>
+  </head>
+  <style>
+    body {
+      background-color: rgba(220, 220, 220, 0.582);
+    }
+    .main {
+      width: 70%;
+      background-color: rgba(73, 71, 71, 0.726);
+      margin: auto;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .main h1 {
+      text-align: center;
+      padding: 20px;
+      color: white;
+      background-color: rgb(85, 207, 211);
+    }
+    .main p {
+      color: white;
+      font-size: 25px;
+      text-align: center;
+      padding: 10px;
+    }
+  </style>
+  <body>
+    <div class="main">
+      <h1>Hello <%=order.name%>,</h1>
+      <p>order Id: <%=order._id%></p>
+      <p>order Date: <%=order.date%></p>
+      <p>Please login to our website to view the order in you Dashboard</p>
+      <p>Thank you for being a part of our community !</p>
+    </div>
+  </body>
+</html>
