@@ -24,45 +24,48 @@ export interface IUser extends Document {
   SignRefreshToken: () => string;
 }
 
-const userSchema: Schema<IUser> = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, "Please enter your name"],
-  },
-  email: {
-    type: String,
-    required: [true, "Please enter your email"],
-    validate: {
-      validator: function (value: string) {
-        return emailRegexPattern.test(value);
+const userSchema: Schema<IUser> = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: [true, "Please enter your name"],
+    },
+    email: {
+      type: String,
+      required: [true, "Please enter your email"],
+      validate: {
+        validator: function (value: string) {
+          return emailRegexPattern.test(value);
+        },
+        message: "please enter a valid email",
       },
-      message: "please enter a valid email",
+      unique: true,
     },
-    unique: true,
-  },
-  password: {
-    type: String,
-    minlength: [5, "password must be at least 6 characters"],
-    select: false,
-  },
-  avatar: {
-    public_id: String,
-    url: String,
-  },
-  role: {
-    type: String,
-    default: "user",
-  },
-  isverfied: {
-    type: Boolean,
-    default: false,
-  },
-  courses: [
-    {
-      courseId: String,
+    password: {
+      type: String,
+      minlength: [5, "password must be at least 6 characters"],
+      select: false,
     },
-  ],
-});
+    avatar: {
+      public_id: String,
+      url: String,
+    },
+    role: {
+      type: String,
+      default: "user",
+    },
+    isverfied: {
+      type: Boolean,
+      default: false,
+    },
+    courses: [
+      {
+        courseId: String,
+      },
+    ],
+  },
+  { timestamps: true }
+);
 
 // hash password before saving
 userSchema.pre<IUser>("save", async function (next) {

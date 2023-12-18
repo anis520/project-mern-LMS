@@ -7,7 +7,7 @@ import ejs from "ejs";
 import sendMail from "../utils/sendMail";
 import userModel from "../models/user.model";
 import CourseModel from "../models/course.model";
-import { newOrder } from "../services/orderService";
+import { getAllOrderService, newOrder } from "../services/orderService";
 import NotificationModel from "../models/notificationModel";
 
 /**
@@ -83,6 +83,27 @@ export const createOrder = CatchAsyncError(
 
       await course.save();
       newOrder(data, res, next);
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
+/**
+ *
+ * @DESC  get all oders -- admin only
+ * @ROUTE /api/v1/get-orders
+ * @method GET
+ * @access private
+ *
+ */
+
+// get all users -- only for admin
+
+export const getAllOrders = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      getAllOrderService(res);
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
