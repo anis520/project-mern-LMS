@@ -129,7 +129,7 @@ export const getAllCourses = CatchAsyncError(
         const courses = await CourseModel.find().select(
           "-courseData.videoUrl  -courseData.suggestion -courseData.questions -courseData.links"
         );
-        await redis.set("allcourses", JSON.stringify(courses));
+        await redis.set("allcourses", JSON.stringify(courses), "EX", 604800);
         res.status(201).json({ status: true, courses });
       }
     } catch (error: any) {
@@ -157,8 +157,6 @@ export const getCourseByUser = CatchAsyncError(
       const courseExists = userCourseList?.find(
         (course: any) => course._id == courseId
       );
-
-      console.log(courseExists);
 
       if (!courseExists) {
         return next(
@@ -425,7 +423,6 @@ export const addReplyToReview = CatchAsyncError(
   }
 );
 
- 
 /**
  *
  * @DESC   Get all courses -- admin only
@@ -434,8 +431,6 @@ export const addReplyToReview = CatchAsyncError(
  * @access private
  *
  */
-
- 
 
 export const getAllCoursesAdmin = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -446,8 +441,6 @@ export const getAllCoursesAdmin = CatchAsyncError(
     }
   }
 );
-
-
 
 /**
  *

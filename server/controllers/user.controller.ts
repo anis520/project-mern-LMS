@@ -226,8 +226,9 @@ export const updateAccessToken = CatchAsyncError(
       }
       const redisSession = await redis.get(decoded.id as string);
       if (!redisSession) {
-        console.log("not in redis");
-        return next(new ErrorHandler("Could not refresh token", 400));
+        return next(
+          new ErrorHandler("Please login for access this resource", 400)
+        );
       }
 
       const user = JSON.parse(redisSession);
@@ -245,6 +246,7 @@ export const updateAccessToken = CatchAsyncError(
       req.user = user;
       res.cookie("access_token", accessToken, accessTokenOptions);
       res.cookie("refresh_token", refreshToken, refreshTokenOptions);
+      await redis.set(user._id, JSON.stringify(user), "EX", 604800);
       res.status(200).json({ status: "success", accessToken });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
