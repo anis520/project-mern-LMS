@@ -132,6 +132,8 @@ export const activateUser = CatchAsyncError(
         return next(new ErrorHandler("Email already exist", 400));
       }
       const user = await userModel.create({ name, email, password });
+      user.isverfied = true;
+      await user.save();
       res.status(201).json({ success: true });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
