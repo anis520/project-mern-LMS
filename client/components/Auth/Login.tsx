@@ -11,8 +11,11 @@ import { FcGoogle } from "react-icons/fc";
 import { styles } from "../../styles/style";
 
 import toast from "react-hot-toast";
+import { useLoginMutation } from "@/redux/features/auth/authApi";
+import { signIn } from "next-auth/react";
 type Props = {
   setRoute: (route: string) => void;
+  setOpen: (open: boolean) => void;
 };
 const schema = Yup.object().shape({
   email: Yup.string()
@@ -20,16 +23,31 @@ const schema = Yup.object().shape({
     .required("Please enter your email"),
   password: Yup.string().required("Please enter your Password !").min(6),
 });
-const Login: FC<Props> = ({ setRoute }) => {
+const Login: FC<Props> = ({ setRoute, setOpen }) => {
   const [show, setShow] = useState(false);
+  const [login, { isSuccess, error, data }] = useLoginMutation();
   const formik = useFormik({
     initialValues: { email: "", password: "" },
     validationSchema: schema,
     onSubmit: async ({ email, password }) => {
-      console.log(email, password);
+      await login({ email, password });
     },
   });
   const { errors, touched, values, handleChange, handleSubmit } = formik;
+
+  useEffect(() => {
+    if (isSuccess) {
+      const message = data?.message || "Login successful";
+      toast.success(message);
+      setOpen(false);
+    }
+    if (error) {
+      if ("data" in error) {
+        const errorData = error as any;
+        toast.error(errorData.data.message);
+      }
+    }
+  }, [isSuccess, error]);
 
   return (
     <div className="w-full">
@@ -95,8 +113,16 @@ const Login: FC<Props> = ({ setRoute }) => {
             Or join with
           </h5>
           <div className="flex items-center justify-center my-3 ">
-            <FcGoogle size={30} className="cursor-pointer mr-2" />
-            <AiFillGithub size={30} className="cursor-pointer ml-2" />
+            <FcGoogle
+              onClick={() => signIn("google")}
+              size={30}
+              className="cursor-pointer mr-2"
+            />
+            <AiFillGithub
+              onClick={() => signIn("github")}
+              size={30}
+              className="cursor-pointer ml-2"
+            />
           </div>
           <h5 className="text-center pt-4 font-Poppins text-[14px]">
             Not have any account ?{" "}

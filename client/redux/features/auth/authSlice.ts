@@ -12,7 +12,8 @@ const authSice = createSlice({
       state.token = action.payload.token;
     },
     userLoggedIn: (state, action) => {
-      state.token = action.payload.accessToken;
+      state.token = action.payload.token;
+      state.user = action.payload.user;
     },
     userLoggedOut: (state, action) => {
       state.token = "";

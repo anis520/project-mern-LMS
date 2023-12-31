@@ -1,5 +1,5 @@
 import Link from "next/link";
-import React, { FC, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import NavItems from "../utils/NavItems";
 import { HiOutlineMenuAlt3, HiOutlineUserCircle } from "react-icons/hi";
 import ThemeSwitcher from "../utils/ThemeSwitcher";
@@ -7,6 +7,11 @@ import CustomModel from "../utils/CustomModel";
 import Login from "../components/Auth/Login";
 import SignUp from "../components/Auth/SignUp";
 import Verification from "./Auth/Verification";
+import { useSelector } from "react-redux";
+import Image from "next/image";
+import { useSession } from "next-auth/react";
+import { useSocialAuthMutation } from "@/redux/features/auth/authApi";
+import toast from "react-hot-toast";
 
 type Props = {
   open: boolean;
@@ -18,12 +23,30 @@ type Props = {
 
 const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
   const [active, setActive] = useState(false);
+  const { data } = useSession();
+  const [socialAuth, { isSuccess, error }] = useSocialAuthMutation();
+
   const [openSidbar, setOpenSidebar] = useState(false);
+  const { user } = useSelector((state: any) => state.auth);
   const handleClose = (e: any) => {
     if (e.target.id == "screen") {
       setOpenSidebar(false);
     }
   };
+  useEffect(() => {
+    if (!user) {
+      if (data) {
+        socialAuth({
+          email: data?.user?.email,
+          avatar: data?.user?.image,
+          name: data?.user?.name,
+        });
+      }
+    }
+    if (isSuccess) {
+      toast.success("login successfully");
+    }
+  }, [data, user]);
 
   if (typeof window !== "undefined") {
     window.addEventListener("scroll", () => {
@@ -35,6 +58,10 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
     });
   }
 
+  const handleMobileMenu = () => {
+    setOpen(true);
+    setOpenSidebar(false);
+  };
   return (
     <div className="w-full relative">
       <div
@@ -64,11 +91,25 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
                   onClick={() => setOpenSidebar(true)}
                 />
               </div>{" "}
-              <HiOutlineUserCircle
-                size={25}
-                className="hidden 800px:block cursor-pointer dark:text-white text-black"
-                onClick={() => setOpen(true)}
-              />
+              {user ? (
+                <Image
+                  width={30}
+                  height={30}
+                  alt="user"
+                  className="hidden 800px:block cursor-pointer rounded-full"
+                  src={
+                    user.avatar
+                      ? user.avatar.url
+                      : require("../public/Avatar.png")
+                  }
+                />
+              ) : (
+                <HiOutlineUserCircle
+                  size={25}
+                  className="hidden 800px:block cursor-pointer dark:text-white text-black"
+                  onClick={() => setOpen(true)}
+                />
+              )}
             </div>
           </div>
         </div>
@@ -81,11 +122,26 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
           >
             <div className="w-[70%] fixed z-[999999999] h-screen bg-white dark:bg-slate-900 dark:bg-opacity-90 top0 right-0 ">
               <NavItems activeItem={activeItem} isMobile={true} />
-              <HiOutlineUserCircle
-                size={25}
-                className=" cursor-pointer ml-5 my-2 text-black dark:text-white"
-                onClick={() => setOpen(true)}
-              />
+              {user ? (
+                <Image
+                  width={30}
+                  height={30}
+                  alt="user"
+                  className="ml-5 my-2  cursor-pointer rounded-full"
+                  src={
+                    user?.avatar
+                      ? user?.avatar?.url
+                      : require("../public/Avatar.png")
+                  }
+                />
+              ) : (
+                <HiOutlineUserCircle
+                  size={25}
+                  className=" cursor-pointer ml-5 my-2 text-black dark:text-white"
+                  onClick={handleMobileMenu}
+                />
+              )}
+
               <br />
               <br />
               <p className="text-[16px] px-2 pl-5 text-black dark:text-white">
