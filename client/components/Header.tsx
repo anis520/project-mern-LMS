@@ -10,7 +10,10 @@ import Verification from "./Auth/Verification";
 import { useSelector } from "react-redux";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
-import { useSocialAuthMutation } from "@/redux/features/auth/authApi";
+import {
+  useLogOutQuery,
+  useSocialAuthMutation,
+} from "@/redux/features/auth/authApi";
 import toast from "react-hot-toast";
 
 type Props = {
@@ -24,6 +27,8 @@ type Props = {
 const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
   const [active, setActive] = useState(false);
   const { data } = useSession();
+  const [logout, setLogout] = useState(false);
+  const {} = useLogOutQuery(undefined, { skip: !logout ? true : false });
   const [socialAuth, { isSuccess, error }] = useSocialAuthMutation();
 
   const [openSidbar, setOpenSidebar] = useState(false);
@@ -42,11 +47,15 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
           name: data?.user?.name,
         });
       }
+      if (isSuccess) {
+        toast.success("login successfully");
+      }
     }
-    if (isSuccess) {
-      toast.success("login successfully");
+
+    if (data == null) {
+      setLogout(true);
     }
-  }, [data, user]);
+  }, [data, user, isSuccess, socialAuth]);
 
   if (typeof window !== "undefined") {
     window.addEventListener("scroll", () => {
@@ -92,17 +101,19 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
                 />
               </div>{" "}
               {user ? (
-                <Image
-                  width={30}
-                  height={30}
-                  alt="user"
-                  className="hidden 800px:block cursor-pointer rounded-full"
-                  src={
-                    user.avatar
-                      ? user.avatar.url
-                      : require("../public/Avatar.png")
-                  }
-                />
+                <Link href={"/profile"}>
+                  <Image
+                    width={30}
+                    height={30}
+                    alt="user"
+                    className="hidden 800px:block cursor-pointer rounded-full"
+                    src={
+                      user.avatar
+                        ? user.avatar.url
+                        : require("../public/Avatar.png")
+                    }
+                  />{" "}
+                </Link>
               ) : (
                 <HiOutlineUserCircle
                   size={25}
@@ -123,17 +134,19 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
             <div className="w-[70%] fixed z-[999999999] h-screen bg-white dark:bg-slate-900 dark:bg-opacity-90 top0 right-0 ">
               <NavItems activeItem={activeItem} isMobile={true} />
               {user ? (
-                <Image
-                  width={30}
-                  height={30}
-                  alt="user"
-                  className="ml-5 my-2  cursor-pointer rounded-full"
-                  src={
-                    user?.avatar
-                      ? user?.avatar?.url
-                      : require("../public/Avatar.png")
-                  }
-                />
+                <Link href={"/profile"}>
+                  <Image
+                    width={30}
+                    height={30}
+                    alt="user"
+                    className="ml-5 my-2  cursor-pointer rounded-full"
+                    src={
+                      user?.avatar
+                        ? user?.avatar?.url
+                        : require("../public/Avatar.png")
+                    }
+                  />
+                </Link>
               ) : (
                 <HiOutlineUserCircle
                   size={25}

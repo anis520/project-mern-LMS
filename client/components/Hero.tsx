@@ -31,6 +31,41 @@ const Hero = (props: Props) => {
             Search
           </button>
         </div>
+        {/* <===========group avatar ================>  */}
+
+        <div className="flex items-center py-5 -space-x-2">
+          <Image
+            src={require("../public/banner.gif")}
+            width={35}
+            height={35}
+            alt="banner"
+            className="    rounded-full   border border-blue-500"
+          />
+          <Image
+            src={require("../public/banner.gif")}
+            width={35}
+            height={35}
+            alt="banner"
+            className="    rounded-full   border border-blue-500"
+          />
+          <Image
+            src={require("../public/banner.gif")}
+            width={35}
+            height={35}
+            alt="banner"
+            className="    rounded-full  border border-blue-500 "
+          />
+          <Image
+            src={require("../public/banner.gif")}
+            width={35}
+            height={35}
+            alt="banner"
+            className="    rounded-full  border border-blue-500 "
+          />
+          <p className="ps-5 font-semibold">
+            +500 students joined this platfrom
+          </p>
+        </div>
       </div>
     </div>
   );
