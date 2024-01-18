@@ -15,6 +15,8 @@ import {
   useSocialAuthMutation,
 } from "@/redux/features/auth/authApi";
 import toast from "react-hot-toast";
+import { useParams } from "next/navigation";
+import cn from "@/utils/cn";
 
 type Props = {
   open: boolean;
@@ -30,7 +32,7 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
   const [logout, setLogout] = useState(false);
   const {} = useLogOutQuery(undefined, { skip: !logout ? true : false });
   const [socialAuth, { isSuccess, error }] = useSocialAuthMutation();
-
+  const param = useParams();
   const [openSidbar, setOpenSidebar] = useState(false);
   const { user } = useSelector((state: any) => state.auth);
   const handleClose = (e: any) => {
@@ -106,7 +108,13 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
                     width={30}
                     height={30}
                     alt="user"
-                    className="hidden 800px:block cursor-pointer rounded-full"
+                    className={cn(
+                      "hidden 800px:block cursor-pointer rounded-full  ",
+                      {
+                        "ring-2 ring-offset-2 dark:ring-[#37a39a]  ring-offset-slate-100 dark:ring-offset-slate-800 ring-[crimson]":
+                          activeItem == 5,
+                      }
+                    )}
                     src={
                       user.avatar
                         ? user.avatar.url
@@ -165,7 +173,7 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
         )}
       </div>
       {route == "login" && (
-        <>
+        <div>
           {open && (
             <CustomModel
               open={open}
@@ -175,10 +183,10 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
               component={Login}
             />
           )}
-        </>
+        </div>
       )}
       {route == "Sign-Up" && (
-        <>
+        <div>
           {open && (
             <CustomModel
               open={open}
@@ -188,10 +196,10 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
               component={SignUp}
             />
           )}
-        </>
+        </div>
       )}
       {route == "verification" && (
-        <>
+        <div>
           {open && (
             <CustomModel
               open={open}
@@ -201,7 +209,7 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
               component={Verification}
             />
           )}
-        </>
+        </div>
       )}
     </div>
   );

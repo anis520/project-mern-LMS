@@ -1,9 +1,11 @@
 import cn from "@/utils/cn";
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 import { AiOutlineLogout } from "react-icons/ai";
 import { RiLockPasswordLine } from "react-icons/ri";
 import { SiCoursera } from "react-icons/si";
+import { MdDashboard } from "react-icons/md";
 
 type Props = {
   user: any;
@@ -68,6 +70,19 @@ function SideBarProfile({
           Enrolled Courses{" "}
         </h5>
       </div>
+      {user?.role == "admin" && (
+        <Link
+          href={"/admin-panel"}
+          className={cn(
+            `w-full flex items-center px-3 py-4 cursor-pointer bg-transparent  duration-200`
+          )}
+        >
+          <MdDashboard size={20} className="dark:text-white" />
+          <h5 className="pl-2 800px:block hidden  dark:text-white  font-Poppins">
+            Admin panel{" "}
+          </h5>
+        </Link>
+      )}
       <div
         className={cn(
           `w-full flex items-center px-3 py-4 cursor-pointer bg-transparent  duration-200`,

@@ -7,12 +7,14 @@ import { redirect } from "next/navigation";
 import ProfileInfo from "./ProfileInfo";
 import ChangePassword from "./ChangePassword";
 import EnrolledCourse from "./EnrolledCourse";
+import { useUpdateAvatarMutation } from "@/redux/features/user/userApi";
 
 type Props = { user: any };
 
 const Profile = (props: Props) => {
   const [scroll, setScroll] = useState(false);
   const [avatar, setAvatar] = useState(null);
+
   const [active, setActive] = useState(1);
   const [logout, setLogout] = useState(false);
   const {} = useLogOutQuery(undefined, { skip: !logout ? true : false });
@@ -49,7 +51,7 @@ const Profile = (props: Props) => {
           logOutHandler={logOutHandler}
         />
       </div>{" "}
-      {active == 1 && <ProfileInfo />}
+      {active == 1 && <ProfileInfo avatar={avatar} user={props?.user} />}
       {active == 2 && <ChangePassword />}
       {active == 3 && <EnrolledCourse />}
     </div>
